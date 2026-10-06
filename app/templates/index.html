@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Req2Test — тест-кейсы из требований</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#E9EDF1;--panel:#fff;--ink:#18212B;--muted:#5B6775;--line:#CBD3DB;--accent:#0F6B6B;
+        --pos:#2E7D4F;--neg:#B3372F;--bnd:#B7791F;--eqv:#3A5BBF;--err-bg:#FBE9E7}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Schibsted Grotesk",system-ui,sans-serif}
+  .shell{max-width:1200px;margin:0 auto;padding:32px 20px 64px}
+  h1{margin:0;font-size:28px;letter-spacing:-.02em}
+  .lead{margin:4px 0 28px;color:var(--muted);max-width:60ch}
+  .layout{display:grid;grid-template-columns:minmax(300px,380px) 1fr;gap:28px;align-items:start}
+  form{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:20px;position:sticky;top:16px}
+  label{display:block;font-weight:500;margin:0 0 6px}
+  .field{margin-bottom:16px}
+  .row{display:flex;gap:12px}.row .field{flex:1}
+  textarea,select,input[type=number]{width:100%;font:inherit;color:inherit;background:#fff;border:1px solid var(--line);border-radius:4px;padding:9px 10px}
+  textarea{min-height:240px;resize:vertical}
+  .hint{color:var(--muted);font-size:14px;margin-top:4px}
+  button{font:inherit;font-weight:500;border-radius:4px;padding:10px 16px;cursor:pointer;border:1px solid var(--accent)}
+  .primary{background:var(--accent);color:#fff;width:100%}
+  .secondary{background:#fff;color:var(--accent)}
+  button:disabled{opacity:.6;cursor:progress}
+  :focus-visible{outline:3px solid #7FB9F5;outline-offset:2px}
+  #error{background:var(--err-bg);border:1px solid var(--neg);color:#7A1F19;border-radius:4px;padding:10px 12px;margin-bottom:16px}
+  .empty{color:var(--muted);border:1px dashed var(--line);border-radius:6px;padding:40px 24px}
+  .head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:12px}
+  .head h2{margin:0;font-size:20px}
+  .head p{margin:4px 0 0;color:var(--muted);max-width:70ch}
+  .assump{background:#FFF6DD;border:1px solid #E5D08A;border-radius:4px;padding:10px 14px;margin:0 0 14px}
+  .assump h3{margin:0 0 4px;font-size:15px}.assump ul{margin:0;padding-left:20px}
+  .case{--c:var(--muted);background:var(--panel);border:1px solid var(--line);border-left:6px solid var(--c);border-radius:4px;margin-bottom:8px}
+  .case[data-type=Positive]{--c:var(--pos)}.case[data-type=Negative]{--c:var(--neg)}
+  .case[data-type=Boundary]{--c:var(--bnd)}.case[data-type=Equivalence]{--c:var(--eqv)}
+  summary{cursor:pointer;padding:10px 14px;display:grid;grid-template-columns:64px 1fr auto;gap:12px;align-items:baseline}
+  .tcid{font-weight:700;color:var(--c)}
+  .meta{color:var(--muted);font-size:14px;white-space:nowrap}
+  .body{padding:4px 14px 14px 90px;display:grid;grid-template-columns:140px 1fr;gap:6px 16px}
+  .body dt{color:var(--muted)}.body dd{margin:0;white-space:pre-wrap}.body ol{margin:0;padding-left:20px}
+  .loader{display:flex;gap:16px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:28px 24px}
+  .loader strong{display:block}.loader span{color:var(--muted);font-size:14px}
+  .spinner{flex:none;width:36px;height:36px;border:4px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:spin .9s linear infinite}
+  .btn-spin{display:inline-block;width:14px;height:14px;margin-right:8px;vertical-align:-2px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .9s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @media(prefers-reduced-motion:reduce){.spinner,.btn-spin{animation-duration:3s}.case.new{animation:none}}
+  .exportbar{flex:none;max-width:320px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}.exportbar select{width:auto}
+  .exportbar .hint{flex-basis:100%;text-align:right;margin:0}
+  .ghost{background:#fff;color:var(--muted);border-color:var(--line);width:100%;margin-top:8px}
+  .case.new{animation:appear .35s ease-out}
+  @keyframes appear{from{opacity:0;transform:translateY(6px)}}
+  .tail{display:flex;gap:12px;align-items:center;color:var(--muted);border:1px dashed var(--line);border-radius:4px;padding:12px 14px;font-size:15px}
+  .tail .spinner{width:20px;height:20px;border-width:3px}
+  .partial{background:#FFF6DD;border:1px solid #E5D08A;border-radius:4px;padding:10px 14px;margin:0 0 14px}
+  @media(max-width:820px){
+    .layout{grid-template-columns:1fr}form{position:static}
+    summary{grid-template-columns:56px 1fr}.meta{grid-column:2}
+    .body{padding-left:14px;grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <h1>Req2Test</h1>
+  <p class="lead">Вставьте User Story или требования — получите тест-кейсы с эквивалентными классами, граничными значениями, позитивными и негативными сценариями.</p>
+
+  <div class="layout">
+    <form id="form">
+      <div id="error" role="alert" hidden></div>
+      <div class="field">
+        <label for="requirements">Требования или User Story</label>
+        <textarea id="requirements" required minlength="20" maxlength="{{ max_chars }}"
+          placeholder="Как пользователь, я хочу зарегистрироваться по email и паролю (8–64 символа), чтобы войти в личный кабинет."></textarea>
+        <div class="hint">От 20 до {{ max_chars }} символов.</div>
+      </div>
+      <div class="row">
+        <div class="field"><label for="max_cases">Макс. кейсов</label>
+          <input id="max_cases" type="number" min="3" max="30" value="10"></div>
+        <div class="field"><label for="language">Язык кейсов</label>
+          <select id="language"><option value="ru">Русский</option><option value="en">English</option></select></div>
+      </div>
+      <button class="primary" id="generate" type="submit">Сгенерировать тест-кейсы</button>
+      <button class="ghost" id="stop" type="button" hidden>Остановить генерацию</button>
+    </form>
+
+    <main id="results">
+      <div class="empty">Здесь появится набор тест-кейсов. Кейсы добавляются по мере генерации.</div>
+    </main>
+  </div>
+</div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const TYPE_RU = {Positive:'Позитивный', Negative:'Негативный', Boundary:'Граничные значения', Equivalence:'Эквивалентный класс'};
+const PRIO_RU = {Critical:'Критичный', High:'Высокий', Medium:'Средний', Low:'Низкий'};
+const FORMATS = [['json','JSON'], ['csv','CSV Standard'], ['zephyr','Zephyr Scale CSV'], ['testrail','TestRail CSV']];
+const IDLE_TIMEOUT_MS = 90000;  // нет ни одного байта столько времени -> считаем, что сервер завис
+const GENERATE_LABEL = 'Сгенерировать тест-кейсы';
+
+let currentSuite = null;   // полный набор из события `done` — единственный источник для экспорта
+let currentFormat = 'csv';
+let controller = null;     // AbortController текущей генерации
+let stopReason = null;     // 'user' | 'idle' — почему мы сами оборвали поток
+
+// Хелпер создания DOM-узлов. Текст вставляется как text node -> XSS из ответа модели невозможен.
+function h(tag, attrs = {}, ...kids) {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === 'class') n.className = v; else if (k.startsWith('data-') || k.startsWith('aria-')) n.setAttribute(k, v); else n[k] = v;
+  }
+  for (const k of kids.flat()) if (k != null) n.append(k);
+  return n;
+}
+
+class StreamError extends Error {}  // ошибка, о которой сообщил сам сервер (событие `error`)
+
+async function errorMessage(r) {
+  try {
+    const j = await r.json();
+    return typeof j.detail === 'string' ? j.detail : (j.detail?.[0]?.msg || 'Проверьте введённые данные.');
+  } catch { return `Ошибка ${r.status}`; }
+}
+
+async function post(url, body, timeoutMs = 30000) {
+  const r = await fetch(url, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body), signal:AbortSignal.timeout(timeoutMs)});
+  if (!r.ok) throw new Error(await errorMessage(r));
+  return r;
+}
+
+// ---------------------------------------------------------------- SSE поверх fetch
+// EventSource умеет только GET, поэтому POST-поток читаем вручную.
+
+function parseFrame(frame) {
+  let event = 'message';
+  const data = [];
+  for (const line of frame.split(/\r?\n/)) {
+    if (!line || line.startsWith(':')) continue;  // ':' — комментарий / keep-alive
+    const i = line.indexOf(':');
+    const field = i < 0 ? line : line.slice(0, i);
+    let value = i < 0 ? '' : line.slice(i + 1);
+    if (value.startsWith(' ')) value = value.slice(1);
+    if (field === 'event') event = value; else if (field === 'data') data.push(value);
+  }
+  return data.length ? {event, data: JSON.parse(data.join('\n'))} : null;
+}
+
+function withIdleTimeout(promise, ms) {
+  let timer;
+  const idle = new Promise((_, reject) => { timer = setTimeout(() => reject(new Error('idle')), ms); });
+  return Promise.race([promise, idle]).finally(() => clearTimeout(timer));
+}
+
+async function* readSSE(response) {
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buf = '';
+  try {
+    for (;;) {
+      let chunk;
+      try {
+        chunk = await withIdleTimeout(reader.read(), IDLE_TIMEOUT_MS);
+      } catch (e) {
+        if (e.message === 'idle') { stopReason = 'idle'; controller?.abort(); }
+        throw e;
+      }
+      if (chunk.done) return;
+      buf += decoder.decode(chunk.value, {stream: true});
+      let m;
+      while ((m = /\r?\n\r?\n/.exec(buf))) {
+        const frame = parseFrame(buf.slice(0, m.index));
+        buf = buf.slice(m.index + m[0].length);
+        if (frame) yield frame;
+      }
+    }
+  } finally {
+    reader.cancel().catch(() => {});
+  }
+}
+
+async function streamSuite(body, onCase) {
+  controller = new AbortController();
+  stopReason = null;
+  const r = await fetch('/api/generate-stream', {method:'POST', headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(body), signal:controller.signal});
+  if (!r.ok) throw new StreamError(await errorMessage(r));  // 422 / 500 до начала потока
+  for await (const {event, data} of readSSE(r)) {
+    if (event === 'case') onCase(data);
+    else if (event === 'done') return data;
+    else if (event === 'error') throw new StreamError(data.detail || 'Ошибка генерации.');
+  }
+  throw new Error('closed');  // поток закрылся без `done` и без `error`
+}
+
+function describeError(e) {
+  if (stopReason === 'user') return 'Генерация остановлена.';
+  if (stopReason === 'idle') return `Сервер не присылал данных ${IDLE_TIMEOUT_MS / 1000} с, генерация прервана. Повторите попытку.`;
+  if (e instanceof StreamError) return e.message;
+  if (e.message === 'closed') return 'Соединение с сервером оборвалось до завершения генерации. Повторите попытку.';
+  if (e instanceof SyntaxError) return 'Сервер прислал повреждённые данные. Повторите попытку.';
+  if (e instanceof TypeError) return 'Нет связи с сервером. Проверьте, что приложение запущено.';
+  return e.message || 'Неизвестная ошибка.';
+}
+
+// ---------------------------------------------------------------- отрисовка
+
+function caseNode(tc, animate = false) {
+  const dl = h('dl', {class:'body'},
+    h('dt', {}, 'Предусловия'), h('dd', {}, tc.preconditions),
+    h('dt', {}, 'Шаги'), h('dd', {}, h('ol', {}, tc.steps.map(s => h('li', {}, s)))),
+    h('dt', {}, 'Тестовые данные'), h('dd', {}, tc.test_data),
+    h('dt', {}, 'Ожидаемый результат'), h('dd', {}, tc.expected_result));
+  return h('details', {class: animate ? 'case new' : 'case', 'data-type':tc.test_type, 'data-id':tc.id},
+    h('summary', {},
+      h('span', {class:'tcid'}, tc.id), h('span', {}, tc.title),
+      h('span', {class:'meta'}, `${TYPE_RU[tc.test_type] || tc.test_type}, ${PRIO_RU[tc.priority] || tc.priority}`)),
+    dl);
+}
+
+function exportBar(enabled) {
+  const fmtSelect = h('select', {'aria-label':'Формат экспорта', disabled:!enabled, onchange:(e) => { currentFormat = e.target.value; }},
+    FORMATS.map(([v, t]) => h('option', {value:v}, t)));
+  fmtSelect.value = currentFormat;
+  return h('div', {class:'exportbar'}, fmtSelect,
+    h('button', {class:'secondary', type:'button', id:'download', disabled:!enabled, onclick:download}, 'Скачать'),
+    enabled ? null : h('p', {class:'hint'}, 'Экспорт станет доступен после завершения генерации.'));
+}
+
+function render(suite) {
+  // Сохраняем раскрытые кейсы, чтобы финальная перерисовка после стрима их не схлопнула.
+  const open = new Set([...document.querySelectorAll('#results details[open]')].map(d => d.dataset.id));
+  const parts = [h('div', {class:'head'},
+    h('div', {}, h('h2', {}, `Тест-кейсов: ${suite.test_cases.length}`), h('p', {role:'status'}, suite.summary)),
+    exportBar(true))];
+  if (suite.assumptions.length)
+    parts.push(h('div', {class:'assump'}, h('h3', {}, 'Допущения и неясности в требованиях'),
+      h('ul', {}, suite.assumptions.map(a => h('li', {}, a)))));
+  parts.push(...suite.test_cases.map(tc => { const n = caseNode(tc); n.open = open.has(tc.id); return n; }));
+  $('#results').replaceChildren(...parts);
+}
+
+const emptyNode = () => h('div', {class:'empty'}, 'Здесь появится набор тест-кейсов. Кейсы добавляются по мере генерации.');
+
+// Вид «идёт генерация»: кейсы добавляются в список по одному, внизу — строка ожидания.
+function streamView(maxCases) {
+  const t0 = Date.now();
+  let count = 0;
+  const title = h('h2', {}, 'Генерация…');
+  const status = h('p', {role:'status'}, 'Claude анализирует требования.');
+  const list = h('div', {});
+  const tailText = h('span', {}, 'Claude анализирует требования и проектирует первый кейс…');
+  const seconds = h('span', {'aria-hidden':'true'}, ' Прошло 0 с');
+  const tail = h('div', {class:'tail'}, h('div', {class:'spinner', 'aria-hidden':'true'}), h('div', {}, tailText, seconds));
+  $('#results').replaceChildren(h('div', {class:'head'}, h('div', {}, title, status), exportBar(false)), list, tail);
+  const timer = setInterval(() => { seconds.textContent = ` Прошло ${Math.floor((Date.now() - t0) / 1000)} с`; }, 1000);
+
+  return {
+    get count() { return count; },
+    addCase(tc) {
+      count += 1;
+      list.append(caseNode(tc, true));
+      title.textContent = `Получено кейсов: ${count}`;
+      status.textContent = `Получено ${count} из не более чем ${maxCases}.`;
+      tailText.textContent = 'Claude пишет следующий тест-кейс…';
+    },
+    // Поток оборвался, но часть кейсов уже показана: оставляем их и честно помечаем набор неполным.
+    markPartial() {
+      tail.remove();
+      title.textContent = `Получено кейсов: ${count} (набор неполный)`;
+      status.textContent = 'Генерация прервана.';
+      $('#results .exportbar .hint')?.remove();
+      list.before(h('div', {class:'partial'},
+        'Генерация не завершилась: показаны только полученные кейсы. Экспорт недоступен — запустите генерацию ещё раз.'));
+    },
+    stop() { clearInterval(timer); },
+  };
+}
+
+function showError(msg) { const box = $('#error'); box.textContent = msg; box.hidden = !msg; }
+
+function setBusy(busy) {
+  const btn = $('#generate');
+  btn.disabled = busy;
+  if (busy) btn.replaceChildren(h('span', {class:'btn-spin', 'aria-hidden':'true'}), 'Генерирую…');
+  else btn.textContent = GENERATE_LABEL;
+  $('#stop').hidden = !busy;
+}
+
+async function download() {
+  if (!currentSuite) return;
+  try {
+    const fmt = currentFormat;
+    const r = await post('/api/export', {format: fmt, suite: currentSuite});
+    const blob = await r.blob();
+    const name = /filename="([^"]+)"/.exec(r.headers.get('Content-Disposition') || '')?.[1] || `req2test.${fmt}`;
+    const a = h('a', {href: URL.createObjectURL(blob), download: name});
+    document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  } catch (e) { showError(e.message); }
+}
+
+$('#stop').addEventListener('click', () => { stopReason = 'user'; controller?.abort(); });
+
+$('#form').addEventListener('submit', async (ev) => {
+  ev.preventDefault();
+  if (controller) return;  // защита от двойного запуска
+  showError('');
+  const previous = currentSuite;
+  currentSuite = null;     // пока идёт новая генерация, старый набор не экспортируем
+  const body = {
+    requirements: $('#requirements').value,
+    max_cases: Number($('#max_cases').value),
+    language: $('#language').value,
+  };
+  setBusy(true);
+  const view = streamView(body.max_cases);
+  try {
+    currentSuite = await streamSuite(body, (tc) => view.addCase(tc));
+    render(currentSuite);
+  } catch (e) {
+    const msg = describeError(e);
+    if (view.count > 0) {
+      view.markPartial();
+    } else if (previous) {         // ничего не пришло — возвращаем прошлый результат
+      currentSuite = previous;
+      render(previous);
+    } else {
+      $('#results').replaceChildren(emptyNode());
+    }
+    showError(msg);
+  } finally {
+    view.stop();
+    controller = null;
+    setBusy(false);
+  }
+});
+</script>
+</body>
+</html>

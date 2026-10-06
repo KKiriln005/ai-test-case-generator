@@ -1,0 +1,84 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install ruff
+      - run: ruff check .
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12"]
+    env:
+      # app.main при импорте проверяет наличие ключа; реальный API в тестах не вызывается.
+      ANTHROPIC_API_KEY: test-key
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: requirements*.txt
+      - run: pip install -r requirements-dev.txt
+      - name: Pytest + coverage
+        run: pytest --cov=app --cov-report=term-missing --cov-report=xml
+      - uses: codecov/codecov-action@v5
+        if: matrix.python-version == '3.12'
+        with:
+          files: coverage.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false   # без токена CI не падает, просто не будет бейджа
+      - uses: actions/upload-artifact@v4
+        if: matrix.python-version == '3.12'
+        with:
+          name: coverage-xml
+          path: coverage.xml
+
+  docker:
+    needs: [lint, test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build image (без push)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          load: true
+          tags: req2test:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Smoke-тест контейнера
+        run: |
+          docker run -d --name app -p 8000:8000 -e ANTHROPIC_API_KEY=test-key req2test:ci
+          for i in $(seq 1 20); do
+            if curl -fs http://localhost:8000/health; then
+              # Контейнер обязан работать от непривилегированного appuser (см. Dockerfile).
+              test "$(docker exec app id -un)" = appuser && exit 0
+              echo "Container runs as $(docker exec app id -un), expected appuser"; exit 1
+            fi
+            sleep 1
+          done
+          docker logs app
+          exit 1
