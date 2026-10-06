@@ -1,7 +1,7 @@
 # Req2Test
 
-[![CI](https://github.com/USER/req2test/actions/workflows/ci.yml/badge.svg)](https://github.com/USER/req2test/actions/workflows/ci.yml)
-[![Coverage](https://codecov.io/gh/USER/req2test/branch/main/graph/badge.svg)](https://codecov.io/gh/USER/req2test)
+[![CI](https://github.com/KKiriln005/ai-test-case-generator/actions/workflows/ci.yml/badge.svg)](https://github.com/KKiriln005/ai-test-case-generator/actions/workflows/ci.yml)
+[![Coverage](https://codecov.io/gh/KKiriln005/ai-test-case-generator/branch/main/graph/badge.svg)](https://codecov.io/gh/KKiriln005/ai-test-case-generator)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -44,7 +44,7 @@ flowchart LR
 Нужен Python 3.10+ и ключ [Anthropic API](https://console.anthropic.com/).
 
 ```bash
-git clone https://github.com/USER/req2test.git && cd req2test
+git clone https://github.com/KKiriln005/ai-test-case-generator.git && cd ai-test-case-generator
 python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 cp .env.example .env                                  # впишите ANTHROPIC_API_KEY
