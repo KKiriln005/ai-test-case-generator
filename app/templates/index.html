@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Req2Test — тест-кейсы из требований</title>
+<title>Req2Test - тест-кейсы из требований</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
@@ -67,7 +67,7 @@
 <body>
 <div class="shell">
   <h1>Req2Test</h1>
-  <p class="lead">Вставьте User Story или требования — получите тест-кейсы с эквивалентными классами, граничными значениями, позитивными и негативными сценариями.</p>
+  <p class="lead">Вставьте User Story или требования - получите тест-кейсы с эквивалентными классами, граничными значениями, позитивными и негативными сценариями.</p>
 
   <div class="layout">
     <form id="form">
@@ -75,7 +75,7 @@
       <div class="field">
         <label for="requirements">Требования или User Story</label>
         <textarea id="requirements" required minlength="20" maxlength="{{ max_chars }}"
-          placeholder="Как пользователь, я хочу зарегистрироваться по email и паролю (8–64 символа), чтобы войти в личный кабинет."></textarea>
+          placeholder="Как пользователь, я хочу зарегистрироваться по email и паролю (8-64 символа), чтобы войти в личный кабинет."></textarea>
         <div class="hint">От 20 до {{ max_chars }} символов.</div>
       </div>
       <div class="row">
@@ -102,10 +102,10 @@ const FORMATS = [['json','JSON'], ['csv','CSV Standard'], ['zephyr','Zephyr Scal
 const IDLE_TIMEOUT_MS = 90000;  // нет ни одного байта столько времени -> считаем, что сервер завис
 const GENERATE_LABEL = 'Сгенерировать тест-кейсы';
 
-let currentSuite = null;   // полный набор из события `done` — единственный источник для экспорта
+let currentSuite = null;   // полный набор из события `done` - единственный источник для экспорта
 let currentFormat = 'csv';
 let controller = null;     // AbortController текущей генерации
-let stopReason = null;     // 'user' | 'idle' — почему мы сами оборвали поток
+let stopReason = null;     // 'user' | 'idle' - почему мы сами оборвали поток
 
 // Хелпер создания DOM-узлов. Текст вставляется как text node -> XSS из ответа модели невозможен.
 function h(tag, attrs = {}, ...kids) {
@@ -139,7 +139,7 @@ function parseFrame(frame) {
   let event = 'message';
   const data = [];
   for (const line of frame.split(/\r?\n/)) {
-    if (!line || line.startsWith(':')) continue;  // ':' — комментарий / keep-alive
+    if (!line || line.startsWith(':')) continue;  // ':' - комментарий / keep-alive
     const i = line.indexOf(':');
     const field = i < 0 ? line : line.slice(0, i);
     let value = i < 0 ? '' : line.slice(i + 1);
@@ -245,7 +245,7 @@ function render(suite) {
 
 const emptyNode = () => h('div', {class:'empty'}, 'Здесь появится набор тест-кейсов. Кейсы добавляются по мере генерации.');
 
-// Вид «идёт генерация»: кейсы добавляются в список по одному, внизу — строка ожидания.
+// Вид «идёт генерация»: кейсы добавляются в список по одному, внизу - строка ожидания.
 function streamView(maxCases) {
   const t0 = Date.now();
   let count = 0;
@@ -274,7 +274,7 @@ function streamView(maxCases) {
       status.textContent = 'Генерация прервана.';
       $('#results .exportbar .hint')?.remove();
       list.before(h('div', {class:'partial'},
-        'Генерация не завершилась: показаны только полученные кейсы. Экспорт недоступен — запустите генерацию ещё раз.'));
+        'Генерация не завершилась: показаны только полученные кейсы. Экспорт недоступен - запустите генерацию ещё раз.'));
     },
     stop() { clearInterval(timer); },
   };
@@ -325,7 +325,7 @@ $('#form').addEventListener('submit', async (ev) => {
     const msg = describeError(e);
     if (view.count > 0) {
       view.markPartial();
-    } else if (previous) {         // ничего не пришло — возвращаем прошлый результат
+    } else if (previous) {         // ничего не пришло - возвращаем прошлый результат
       currentSuite = previous;
       render(previous);
     } else {

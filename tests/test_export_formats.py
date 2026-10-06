@@ -30,7 +30,7 @@ def test_zephyr_one_step_per_row():
     assert first[4] == "High"                 # Critical -> High
     assert first[6] == "'=SUM(1)"             # formula injection экранирован
     assert middle[0] == "" and middle[7] == ""
-    assert last[7] == "Error is shown"        # ожидаемый результат — только на последнем шаге
+    assert last[7] == "Error is shown"        # ожидаемый результат - только на последнем шаге
 
 
 def test_testrail_one_step_per_row():

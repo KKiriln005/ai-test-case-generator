@@ -3,7 +3,7 @@
 Схема `TestSuite` одновременно:
   1. валидирует ответ модели,
   2. через `model_json_schema()` становится `input_schema` инструмента для Claude,
-     поэтому `description` у полей — это инструкции для модели.
+     поэтому `description` у полей - это инструкции для модели.
 """
 from enum import Enum
 from typing import Literal

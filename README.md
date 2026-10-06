@@ -138,7 +138,7 @@ app/
 │   └── export_service.py
 └── templates/index.html
 tests/                   # pytest, Anthropic is mocked
-scripts/                 # fake_stream_server.py — local stand for manual UI testing
+scripts/                 # fake_stream_server.py - local stand for manual UI testing
 docs/streaming.md        # SSE design (in Russian)
 ```
 
@@ -227,7 +227,7 @@ ruff check .
 
 `scripts/fake_stream_server.py` запускает приложение с фейковым AI-сервисом: кейсы приходят с паузой,
 токены не тратятся. Сценарии: `ok`, `error` (сбой после 2-го кейса), `early` (429 до первого кейса),
-`drop` (обрыв без `done`), `hang` (зависание — проверка кнопки «Остановить»).
+`drop` (обрыв без `done`), `hang` (зависание - проверка кнопки «Остановить»).
 
 ```bash
 python scripts/fake_stream_server.py error     # затем открыть http://127.0.0.1:8000
@@ -280,7 +280,7 @@ app/
 │   └── export_service.py
 └── templates/index.html
 tests/                   # pytest, Anthropic замокан
-scripts/                 # fake_stream_server.py — стенд для ручной проверки UI
+scripts/                 # fake_stream_server.py - стенд для ручной проверки UI
 docs/streaming.md        # концепция SSE
 ```
 

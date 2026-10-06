@@ -12,7 +12,7 @@ Claude --partial JSON--> AIService.stream_test_suite --CaseExtractor--> TestCase
 ```
 
 ## Контракт `POST /api/generate-stream`
-Тело запроса — то же, что у `/api/generate`. Ответ: `text/event-stream`.
+Тело запроса - то же, что у `/api/generate`. Ответ: `text/event-stream`.
 
 | event   | data                                   | когда                                   |
 |---------|----------------------------------------|-----------------------------------------|

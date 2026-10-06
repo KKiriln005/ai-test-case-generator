@@ -1,8 +1,8 @@
 """Сервис интеграции с Anthropic API.
 
 Гарантия структуры: заставляем Claude вызвать инструмент `submit_test_suite`
-(tool_choice = конкретный tool), входная схема которого — JSON Schema нашей Pydantic-модели.
-Ответ дополнительно валидируется Pydantic, при сбое — одна повторная попытка.
+(tool_choice = конкретный tool), входная схема которого - JSON Schema нашей Pydantic-модели.
+Ответ дополнительно валидируется Pydantic, при сбое - одна повторная попытка.
 
 Два режима: `generate_test_suite` (весь набор разом) и `stream_test_suite`
 (кейсы по мере генерации, для SSE).
@@ -52,7 +52,7 @@ class StreamEvent:
 
 
 def _translate_api_error(exc: Exception) -> AIServiceError:
-    """Перевод ошибок SDK в доменные. Подробности — только в лог."""
+    """Перевод ошибок SDK в доменные. Подробности - только в лог."""
     # Порядок важен: специфичные классы идут раньше базовых (APITimeoutError -> APIConnectionError,
     # AuthenticationError и др. -> APIStatusError).
     if isinstance(exc, (AuthenticationError, PermissionDeniedError)):

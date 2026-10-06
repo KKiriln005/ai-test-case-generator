@@ -57,14 +57,14 @@ def _to_csv_standard(suite: TestSuite) -> ExportResult:
 
 
 def _step_positions(tc: TestCase):
-    """Для формата «один шаг — одна строка»: (шаг, это первый шаг?, это последний шаг?)."""
+    """Для формата «один шаг - одна строка»: (шаг, это первый шаг?, это последний шаг?)."""
     last = len(tc.steps) - 1
     for i, step in enumerate(tc.steps):
         yield step, i == 0, i == last
 
 
 def _to_zephyr(suite: TestSuite) -> ExportResult:
-    """Zephyr Scale: поля кейса — в первой строке, остальные строки содержат только шаги."""
+    """Zephyr Scale: поля кейса - в первой строке, остальные строки содержат только шаги."""
     header = ["Test Case Name", "Objective", "Precondition", "Status", "Priority",
               "Step", "Test Data", "Expected Result"]
     rows = []
@@ -78,13 +78,13 @@ def _to_zephyr(suite: TestSuite) -> ExportResult:
                 _ZEPHYR_PRIORITY[tc.priority.value] if first else "",
                 step,
                 tc.test_data if first else "",
-                tc.expected_result if last else "",  # ожидаемый результат — на последнем шаге
+                tc.expected_result if last else "",  # ожидаемый результат - на последнем шаге
             ])
     return _csv_result(header, rows)
 
 
 def _to_testrail(suite: TestSuite) -> ExportResult:
-    """TestRail (шаблон Test Case Steps): поля кейса — в первой строке, далее строки шагов."""
+    """TestRail (шаблон Test Case Steps): поля кейса - в первой строке, далее строки шагов."""
     header = ["Title", "Section", "Type", "Priority", "Preconditions",
               "Steps (Step)", "Steps (Expected Result)"]
     rows = []
@@ -96,7 +96,7 @@ def _to_testrail(suite: TestSuite) -> ExportResult:
                 tc.title if first else "",
                 "Req2Test" if first else "",
                 "Functional" if first else "",
-                tc.priority.value if first else "",  # Low/Medium/High/Critical — как в TestRail
+                tc.priority.value if first else "",  # Low/Medium/High/Critical - как в TestRail
                 tc.preconditions if first else "",
                 step_text,
                 tc.expected_result if last else "",

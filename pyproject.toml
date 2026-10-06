@@ -5,8 +5,8 @@ src = ["."]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP"]
-# E501: длинные description в Pydantic-схемах — это промпт для модели, не переносим.
-# B008: Depends(...) в аргументах — штатный паттерн FastAPI.
+# E501: длинные description в Pydantic-схемах - это промпт для модели, не переносим.
+# B008: Depends(...) в аргументах - штатный паттерн FastAPI.
 ignore = ["E501", "B008"]
 
 [tool.ruff.lint.isort]

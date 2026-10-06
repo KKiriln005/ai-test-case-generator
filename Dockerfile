@@ -16,7 +16,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PATH="/opt/venv/bin:$PATH"
 
-# Запуск не от root. Имя `appuser` (UID/GID 10001) — единое для Dockerfile и документации;
+# Запуск не от root. Имя `appuser` (UID/GID 10001) - единое для Dockerfile и документации;
 # оно не совпадает с каталогом /app и пакетом `app`, поэтому не путается с ними.
 RUN groupadd --system --gid 10001 appuser \
  && useradd --system --uid 10001 --gid appuser --no-create-home --home-dir /nonexistent appuser
