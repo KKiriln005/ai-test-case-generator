@@ -1,4 +1,4 @@
-"""FastAPI-зависимости. Сервис создаётся один раз и переиспользуется (общий HTTP-пул)."""
+"""FastAPI-залежності. Сервіс створюється один раз і використовується повторно (спільний HTTP-пул)."""
 from functools import lru_cache
 
 from app.config import get_settings

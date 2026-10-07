@@ -1,4 +1,4 @@
-"""Точка входа. Запуск: uvicorn app.main:app --reload"""
+"""Точка входу. Запуск: uvicorn app.main:app --reload"""
 import logging
 from pathlib import Path
 
@@ -17,14 +17,14 @@ templates = Jinja2Templates(directory=BASE_DIR / "templates")
 
 
 def create_app() -> FastAPI:
-    get_settings()  # fail-fast: если нет ANTHROPIC_API_KEY, приложение не стартует
+    get_settings()  # fail-fast: якщо немає ANTHROPIC_API_KEY, застосунок не стартує
 
-    app = FastAPI(title="Req2Test", version="0.1.0", description="AI-генератор тест-кейсов из требований")
+    app = FastAPI(title="Req2Test", version="0.1.0", description="AI-генератор тест-кейсів з вимог")
     app.include_router(router)
 
     @app.exception_handler(AIServiceError)
     async def ai_error_handler(_: Request, exc: AIServiceError) -> JSONResponse:
-        # Клиенту отдаём только безопасное сообщение; детали уже в логах.
+        # Клієнту віддаємо лише безпечне повідомлення; деталі вже в логах.
         return JSONResponse(status_code=exc.status_code, content={"detail": exc.public_message})
 
     @app.get("/", response_class=HTMLResponse, include_in_schema=False)

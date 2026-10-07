@@ -1,9 +1,9 @@
-"""Фабрики тестовых данных."""
+"""Фабрики тестових даних."""
 
 
 def make_case(n: int, **overrides) -> dict:
     data = {
-        "id": f"WRONG-{n}",  # сервер обязан перенумеровать
+        "id": f"WRONG-{n}",  # сервер зобов'язаний перенумерувати
         "title": f"Login scenario number {n}",
         "test_type": "Positive",
         "priority": "High",
@@ -17,7 +17,7 @@ def make_case(n: int, **overrides) -> dict:
 
 
 def make_payload(count: int = 3) -> dict:
-    """Ответ модели (input инструмента submit_test_suite)."""
+    """Відповідь моделі (input інструмента submit_test_suite)."""
     return {
         "summary": "Login feature.",
         "assumptions": ["Lockout policy is unknown"],

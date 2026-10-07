@@ -1,11 +1,11 @@
-"""Сервис интеграции с Anthropic API.
+"""Сервіс інтеграції з Anthropic API.
 
-Гарантия структуры: заставляем Claude вызвать инструмент `submit_test_suite`
-(tool_choice = конкретный tool), входная схема которого - JSON Schema нашей Pydantic-модели.
-Ответ дополнительно валидируется Pydantic, при сбое - одна повторная попытка.
+Гарантія структури: змушуємо Claude викликати інструмент `submit_test_suite`
+(tool_choice = конкретний tool), вхідна схема якого - JSON Schema нашої Pydantic-моделі.
+Відповідь додатково валідується Pydantic, у разі збою - одна повторна спроба.
 
-Два режима: `generate_test_suite` (весь набор разом) и `stream_test_suite`
-(кейсы по мере генерации, для SSE).
+Два режими: `generate_test_suite` (весь набір разом) і `stream_test_suite`
+(кейси в міру генерації, для SSE).
 """
 import logging
 from collections.abc import AsyncIterator
@@ -39,22 +39,22 @@ from app.services.stream_parser import CaseExtractor
 logger = logging.getLogger(__name__)
 
 _MAX_VALIDATION_ATTEMPTS = 2
-# Все ошибки SDK, которые мы переводим в доменные исключения.
+# Усі помилки SDK, які ми перетворюємо на доменні винятки.
 _API_ERRORS = (APIStatusError, APIConnectionError)
 
 
 @dataclass(frozen=True)
 class StreamEvent:
-    """Событие потока: "case" (один тест-кейс) или "done" (весь набор, для экспорта)."""
+    """Подія потоку: "case" (один тест-кейс) або "done" (весь набір, для експорту)."""
 
     event: str
     data: dict
 
 
 def _translate_api_error(exc: Exception) -> AIServiceError:
-    """Перевод ошибок SDK в доменные. Подробности - только в лог."""
-    # Порядок важен: специфичные классы идут раньше базовых (APITimeoutError -> APIConnectionError,
-    # AuthenticationError и др. -> APIStatusError).
+    """Перетворення помилок SDK на доменні. Подробиці - лише в лог."""
+    # Порядок важливий: специфічні класи йдуть раніше за базові (APITimeoutError -> APIConnectionError,
+    # AuthenticationError та ін. -> APIStatusError).
     if isinstance(exc, (AuthenticationError, PermissionDeniedError)):
         logger.error("Anthropic auth/permission error: %s", exc)
         return AIConfigError()
@@ -69,9 +69,9 @@ def _translate_api_error(exc: Exception) -> AIServiceError:
         return AIRequestRejectedError()
     if isinstance(exc, APIStatusError):
         logger.error("Anthropic API status %s: %s", exc.status_code, exc)
-        if exc.status_code == 404:  # неверное имя модели
+        if exc.status_code == 404:  # неправильна назва моделі
             return AIConfigError()
-        if exc.status_code >= 500:  # включая 529 overloaded
+        if exc.status_code >= 500:  # включно з 529 overloaded
             return AIUnavailableError()
     return AIServiceError()
 
@@ -79,7 +79,7 @@ def _translate_api_error(exc: Exception) -> AIServiceError:
 class AIService:
     def __init__(self, settings: Settings, client: AsyncAnthropic | None = None) -> None:
         self._settings = settings
-        # client можно подменить в тестах (dependency injection).
+        # client можна підмінити в тестах (dependency injection).
         self._client = client or AsyncAnthropic(
             api_key=settings.anthropic_api_key.get_secret_value(),
             timeout=settings.anthropic_timeout_s,
@@ -91,7 +91,7 @@ class AIService:
             "input_schema": TestSuite.model_json_schema(),
         }
 
-    # ------------------------------------------------------------------ обычный режим
+    # ------------------------------------------------------------------ звичайний режим
 
     async def generate_test_suite(self, request: GenerateRequest) -> TestSuite:
         system, messages = self._build_prompt(request)
@@ -100,7 +100,7 @@ class AIService:
             response = await self._call_api(system, messages)
 
             if response.stop_reason == "max_tokens":
-                # Ответ обрезан -> JSON невалиден, повтор с теми же параметрами не поможет.
+                # Відповідь обрізано -> JSON невалідний, повтор з тими самими параметрами не допоможе.
                 logger.error("Response truncated by max_tokens (attempt %s)", attempt)
                 raise AIOutputError()
 
@@ -119,12 +119,12 @@ class AIService:
 
         raise AIOutputError()
 
-    # ------------------------------------------------------------------ потоковый режим
+    # ------------------------------------------------------------------ потоковий режим
 
     async def stream_test_suite(self, request: GenerateRequest) -> AsyncIterator[StreamEvent]:
-        """Отдаёт "case" по мере готовности каждого кейса и в конце "done" с полным набором.
+        """Віддає "case" в міру готовності кожного кейса і наприкінці "done" з повним набором.
 
-        Ретраев нет: часть данных уже ушла клиенту, повтор дал бы дубликаты.
+        Ретраїв немає: частина даних уже пішла клієнту, повтор дав би дублікати.
         """
         system, messages = self._build_prompt(request)
         extractor = CaseExtractor()
@@ -149,7 +149,7 @@ class AIService:
                 final = await stream.get_final_message()
         except _API_ERRORS as exc:
             raise _translate_api_error(exc) from exc
-        except ValueError as exc:  # json.JSONDecodeError из парсера потока
+        except ValueError as exc:  # json.JSONDecodeError з парсера потоку
             logger.error("Broken JSON in stream: %s", exc)
             raise AIOutputError() from exc
 
@@ -165,7 +165,7 @@ class AIService:
             raise AIOutputError() from exc
         yield StreamEvent("done", self._postprocess(suite, request.max_cases).model_dump(mode="json"))
 
-    # ------------------------------------------------------------------ внутреннее
+    # ------------------------------------------------------------------ внутрішнє
 
     @staticmethod
     def _build_prompt(request: GenerateRequest) -> tuple[str, list[dict]]:
@@ -194,7 +194,7 @@ class AIService:
 
     @staticmethod
     def _postprocess(suite: TestSuite, max_cases: int) -> TestSuite:
-        """Не доверяем модели в мелочах: обрезаем по лимиту и перенумеровываем ID."""
+        """Не довіряємо моделі в дрібницях: обрізаємо за лімітом і перенумеровуємо ID."""
         suite.test_cases = suite.test_cases[:max_cases]
         for index, case in enumerate(suite.test_cases, start=1):
             case.id = f"TC-{index:03d}"

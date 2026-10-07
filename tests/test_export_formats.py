@@ -24,13 +24,13 @@ def read_rows(fmt: ExportFormat) -> list[list[str]]:
 
 def test_zephyr_one_step_per_row():
     rows = read_rows(ExportFormat.ZEPHYR)
-    assert len(rows) == 4  # заголовок + 3 шага
+    assert len(rows) == 4  # заголовок + 3 кроки
     first, middle, last = rows[1], rows[2], rows[3]
     assert first[0] == "Login is rejected"
     assert first[4] == "High"                 # Critical -> High
-    assert first[6] == "'=SUM(1)"             # formula injection экранирован
+    assert first[6] == "'=SUM(1)"             # formula injection екрановано
     assert middle[0] == "" and middle[7] == ""
-    assert last[7] == "Error is shown"        # ожидаемый результат - только на последнем шаге
+    assert last[7] == "Error is shown"        # очікуваний результат - лише на останньому кроці
 
 
 def test_testrail_one_step_per_row():

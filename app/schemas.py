@@ -1,9 +1,9 @@
-"""Pydantic-схемы: единый контракт между API, AI-сервисом и экспортом.
+"""Pydantic-схеми: єдиний контракт між API, AI-сервісом та експортом.
 
-Схема `TestSuite` одновременно:
-  1. валидирует ответ модели,
-  2. через `model_json_schema()` становится `input_schema` инструмента для Claude,
-     поэтому `description` у полей - это инструкции для модели.
+Схема `TestSuite` водночас:
+  1. валідує відповідь моделі,
+  2. через `model_json_schema()` стає `input_schema` інструмента для Claude,
+     тому `description` у полів - це інструкції для моделі.
 """
 from enum import Enum
 from typing import Literal
@@ -19,7 +19,7 @@ class Priority(str, Enum):
 
 
 class TestType(str, Enum):
-    __test__ = False  # чтобы pytest не принял класс за тестовый
+    __test__ = False  # щоб pytest не вважав клас тестовим
     POSITIVE = "Positive"
     NEGATIVE = "Negative"
     BOUNDARY = "Boundary"          # Boundary Value Analysis
@@ -28,13 +28,13 @@ class TestType(str, Enum):
 
 class ExportFormat(str, Enum):
     JSON = "json"
-    CSV = "csv"            # стандартный CSV: один кейс = одна строка
-    ZEPHYR = "zephyr"      # Zephyr Scale CSV: один шаг = одна строка
-    TESTRAIL = "testrail"  # TestRail CSV (Test Case Steps): один шаг = одна строка
+    CSV = "csv"            # стандартний CSV: один кейс = один рядок
+    ZEPHYR = "zephyr"      # Zephyr Scale CSV: один крок = один рядок
+    TESTRAIL = "testrail"  # TestRail CSV (Test Case Steps): один крок = один рядок
 
 
 class _Strict(BaseModel):
-    # extra="forbid" -> additionalProperties: false в JSON Schema и отказ от «лишних» полей.
+    # extra="forbid" -> additionalProperties: false в JSON Schema і відмова від «зайвих» полів.
     model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
 
 
@@ -62,16 +62,16 @@ class TestSuite(_Strict):
 # ---------- DTO для API ----------
 
 class GenerateRequest(BaseModel):
-    requirements: str = Field(min_length=20, max_length=10_000, description="User Story или требования")
+    requirements: str = Field(min_length=20, max_length=10_000, description="User Story або вимоги")
     max_cases: int = Field(default=10, ge=3, le=30)
-    language: Literal["ru", "en"] = "ru"
+    language: Literal["uk", "en"] = "uk"
 
     @field_validator("requirements")
     @classmethod
     def _not_blank(cls, v: str) -> str:
         v = v.strip()
         if len(v) < 20:
-            raise ValueError("Требования слишком короткие: опишите функциональность подробнее (от 20 символов).")
+            raise ValueError("Вимоги занадто короткі: опишіть функціональність детальніше (від 20 символів).")
         return v
 
 

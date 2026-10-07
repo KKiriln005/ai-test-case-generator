@@ -6,7 +6,7 @@
 ![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-**[English](#english)** · **[Русский](#russian)**
+**[English](#english)** · **[Українська](#ukrainian)**
 
 <a id="english"></a>
 
@@ -139,7 +139,7 @@ app/
 └── templates/index.html
 tests/                   # pytest, Anthropic is mocked
 scripts/                 # fake_stream_server.py - local stand for manual UI testing
-docs/streaming.md        # SSE design (in Russian)
+docs/streaming.md        # SSE design (in Ukrainian)
 ```
 
 ### Roadmap
@@ -154,28 +154,28 @@ MIT, see [LICENSE](LICENSE).
 
 ---
 
-<a id="russian"></a>
+<a id="ukrainian"></a>
 
-## 🇷🇺 Русский
+## 🇺🇦 Українська
 
-**AI-генератор тест-кейсов из требований и User Stories.** Вставьте требования, получите структурированный набор
-тест-кейсов (позитивные и негативные сценарии, эквивалентные классы, граничные значения) и выгрузите его в
-Zephyr Scale, TestRail, CSV или JSON.
+**AI-генератор тест-кейсів з вимог і User Stories.** Вставте вимоги, отримайте структурований набір
+тест-кейсів (позитивні та негативні сценарії, класи еквівалентності, граничні значення) і вивантажте його в
+Zephyr Scale, TestRail, CSV або JSON.
 
-### Возможности
+### Можливості
 
-- **Техники тест-дизайна в промпте:** Equivalence Partitioning, Boundary Value Analysis, Positive / Negative Path.
-- **Гарантированная структура:** Claude вызывает tool с JSON Schema из Pydantic-модели, ответ валидируется,
-  при сбое один повтор. Поля кейса: `ID`, `Title`, `Preconditions`, `Steps`, `Expected Result`, `Priority`, `Test Data`.
-- **Потоковая генерация (SSE):** кейсы появляются в интерфейсе по одному, по мере того как Claude их пишет;
-  генерацию можно остановить, ошибка посреди потока не теряет уже полученные кейсы.
-- **Допущения:** модель отдельно перечисляет неясности и пробелы в требованиях.
-- **Экспорт** в четыре формата, защита от CSV/Formula Injection.
-- **Надёжность:** ошибки Anthropic API (401, 429, таймауты, 5xx, обрезка по `max_tokens`) превращаются в понятные
-  ответы, внутренние детали клиенту не отдаются.
-- **Инженерная база:** тесты с замоканным API, `ruff`, Docker, GitHub Actions.
+- **Техніки тест-дизайну в промпті:** Equivalence Partitioning, Boundary Value Analysis, Positive / Negative Path.
+- **Гарантована структура:** Claude викликає tool з JSON Schema з Pydantic-моделі, відповідь валідується,
+  у разі збою один повтор. Поля кейса: `ID`, `Title`, `Preconditions`, `Steps`, `Expected Result`, `Priority`, `Test Data`.
+- **Потокова генерація (SSE):** кейси з'являються в інтерфейсі по одному, у міру того як Claude їх пише;
+  генерацію можна зупинити, помилка посеред потоку не втрачає вже отримані кейси.
+- **Припущення:** модель окремо перелічує неясності та прогалини у вимогах.
+- **Експорт** у чотири формати, захист від CSV/Formula Injection.
+- **Надійність:** помилки Anthropic API (401, 429, таймаути, 5xx, обрізання за `max_tokens`) перетворюються на зрозумілі
+  відповіді, внутрішні деталі клієнту не віддаються.
+- **Інженерна база:** тести із замоканим API, `ruff`, Docker, GitHub Actions.
 
-### Как это работает
+### Як це працює
 
 ```mermaid
 flowchart LR
@@ -189,33 +189,33 @@ flowchart LR
   EXP --> OUT[JSON / CSV / Zephyr / TestRail]
 ```
 
-### Быстрый старт
+### Швидкий старт
 
-Нужен Python 3.10+ и ключ [Anthropic API](https://console.anthropic.com/).
+Потрібен Python 3.10+ і ключ [Anthropic API](https://console.anthropic.com/).
 
 ```bash
 git clone https://github.com/KKiriln005/ai-test-case-generator.git && cd ai-test-case-generator
 python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-cp .env.example .env                                  # впишите ANTHROPIC_API_KEY
+cp .env.example .env                                  # впишіть ANTHROPIC_API_KEY
 uvicorn app.main:app --reload
 ```
 
-Интерфейс: http://127.0.0.1:8000, Swagger: http://127.0.0.1:8000/docs.
+Інтерфейс: http://127.0.0.1:8000, Swagger: http://127.0.0.1:8000/docs.
 
 #### Docker Compose
 
 ```bash
-cp .env.example .env     # впишите ANTHROPIC_API_KEY
+cp .env.example .env     # впишіть ANTHROPIC_API_KEY
 docker compose up --build
 ```
 
-Контейнер работает не от root, а от системного пользователя **`appuser`** (UID/GID `10001`).
-Код в `/app` принадлежит root и доступен `appuser` только на чтение. Если монтируете в контейнер
-каталог с правом записи, выдайте права этому UID: `chown -R 10001:10001 <каталог>`.
-Проверка: `docker compose exec req2test whoami` → `appuser`.
+Контейнер працює не від root, а від системного користувача **`appuser`** (UID/GID `10001`).
+Код у `/app` належить root і доступний `appuser` лише для читання. Якщо монтуєте в контейнер
+каталог із правом запису, надайте права цьому UID: `chown -R 10001:10001 <каталог>`.
+Перевірка: `docker compose exec req2test whoami` → `appuser`.
 
-#### Тесты и линтер
+#### Тести та лінтер
 
 ```bash
 pip install -r requirements-dev.txt
@@ -223,73 +223,73 @@ ANTHROPIC_API_KEY=test pytest --cov=app    # Windows PowerShell: $env:ANTHROPIC_
 ruff check .
 ```
 
-#### Ручная проверка интерфейса без API-ключа
+#### Ручна перевірка інтерфейсу без API-ключа
 
-`scripts/fake_stream_server.py` запускает приложение с фейковым AI-сервисом: кейсы приходят с паузой,
-токены не тратятся. Сценарии: `ok`, `error` (сбой после 2-го кейса), `early` (429 до первого кейса),
-`drop` (обрыв без `done`), `hang` (зависание - проверка кнопки «Остановить»).
+`scripts/fake_stream_server.py` запускає застосунок з фейковим AI-сервісом: кейси приходять з паузою,
+токени не витрачаються. Сценарії: `ok`, `error` (збій після 2-го кейса), `early` (429 до першого кейса),
+`drop` (обрив без `done`), `hang` (зависання - перевірка кнопки «Зупинити генерацію»).
 
 ```bash
-python scripts/fake_stream_server.py error     # затем открыть http://127.0.0.1:8000
-FAKE_DELAY=2 python scripts/fake_stream_server.py ok   # медленнее, чтобы рассмотреть появление кейсов
+python scripts/fake_stream_server.py error     # потім відкрити http://127.0.0.1:8000
+FAKE_DELAY=2 python scripts/fake_stream_server.py ok   # повільніше, щоб роздивитися появу кейсів
 ```
 
-### Конфигурация (`.env`)
+### Конфігурація (`.env`)
 
-| Переменная | По умолчанию | Описание |
+| Змінна | За замовчуванням | Опис |
 |---|---|---|
-| `ANTHROPIC_API_KEY` | обязательна | ключ API |
+| `ANTHROPIC_API_KEY` | обов'язкова | ключ API |
 | `ANTHROPIC_MODEL` | `claude-sonnet-5-5` | модель |
-| `ANTHROPIC_MAX_TOKENS` | `8000` | лимит токенов ответа |
-| `ANTHROPIC_TIMEOUT_S` | `90` | таймаут запроса, сек |
-| `ANTHROPIC_MAX_RETRIES` | `2` | ретраи сети / 429 / 5xx внутри SDK |
+| `ANTHROPIC_MAX_TOKENS` | `8000` | ліміт токенів відповіді |
+| `ANTHROPIC_TIMEOUT_S` | `90` | таймаут запиту, с |
+| `ANTHROPIC_MAX_RETRIES` | `2` | ретраї мережі / 429 / 5xx усередині SDK |
 
-### Форматы экспорта
+### Формати експорту
 
-| Формат | Структура | Для чего |
+| Формат | Структура | Для чого |
 |---|---|---|
-| **JSON** | полный набор вместе с `summary` и `assumptions` | интеграции, дальнейшая обработка |
-| **CSV Standard** | один кейс = одна строка, шаги в одной ячейке с нумерацией | Excel, Google Sheets, ревью |
-| **Zephyr Scale CSV** | один шаг = одна строка; `Critical` → `High`, статус `Draft` | импорт в Zephyr Scale |
-| **TestRail CSV** | один шаг = одна строка; тестовые данные внутри первого шага | импорт в TestRail (шаблон Test Case Steps) |
+| **JSON** | повний набір разом із `summary` і `assumptions` | інтеграції, подальша обробка |
+| **CSV Standard** | один кейс = один рядок, кроки в одній комірці з нумерацією | Excel, Google Sheets, рев'ю |
+| **Zephyr Scale CSV** | один крок = один рядок; `Critical` → `High`, статус `Draft` | імпорт у Zephyr Scale |
+| **TestRail CSV** | один крок = один рядок; тестові дані всередині першого кроку | імпорт у TestRail (шаблон Test Case Steps) |
 
-> Обе системы при импорте показывают мастер сопоставления колонок. Первый импорт стоит сделать на пробном проекте.
+> Обидві системи під час імпорту показують майстер зіставлення колонок. Перший імпорт варто зробити в пробному проєкті.
 
 ### API
 
-| Метод и путь | Назначение |
+| Метод і шлях | Призначення |
 |---|---|
-| `POST /api/generate` | сгенерировать набор тест-кейсов |
-| `POST /api/generate-stream` | то же потоком SSE (см. [docs/streaming.md](docs/streaming.md)) |
-| `POST /api/export` | выгрузить набор в выбранном формате |
-| `GET /health` | проверка живости |
+| `POST /api/generate` | згенерувати набір тест-кейсів |
+| `POST /api/generate-stream` | те саме потоком SSE (див. [docs/streaming.md](docs/streaming.md)) |
+| `POST /api/export` | вивантажити набір у вибраному форматі |
+| `GET /health` | перевірка живості |
 
-### Структура проекта
+### Структура проєкту
 
 ```
 app/
-├── main.py              # приложение, обработка ошибок
-├── config.py            # настройки из .env
-├── schemas.py           # Pydantic-схемы (контракт для API, модели и экспорта)
-├── prompts.py           # системный промпт
-├── api/                 # роуты и зависимости
-├── core/exceptions.py   # доменные ошибки с HTTP-статусами
+├── main.py              # застосунок, обробка помилок
+├── config.py            # налаштування з .env
+├── schemas.py           # Pydantic-схеми (контракт для API, моделі та експорту)
+├── prompts.py           # системний промпт
+├── api/                 # роути та залежності
+├── core/exceptions.py   # доменні помилки з HTTP-статусами
 ├── services/
-│   ├── ai_service.py    # вызов Claude, валидация, ретраи, стриминг
-│   ├── stream_parser.py # разбор частичного JSON потока
+│   ├── ai_service.py    # виклик Claude, валідація, ретраї, стримінг
+│   ├── stream_parser.py # розбір часткового JSON потоку
 │   └── export_service.py
 └── templates/index.html
-tests/                   # pytest, Anthropic замокан
-scripts/                 # fake_stream_server.py - стенд для ручной проверки UI
-docs/streaming.md        # концепция SSE
+tests/                   # pytest, Anthropic замокано
+scripts/                 # fake_stream_server.py - стенд для ручної перевірки UI
+docs/streaming.md        # концепція SSE
 ```
 
 ### Roadmap
 
-- [x] Подключить SSE-стриминг в UI
-- [ ] Импорт требований из Jira / Confluence
-- [ ] История генераций и сравнение версий наборов
+- [x] Підключити SSE-стримінг в UI
+- [ ] Імпорт вимог з Jira / Confluence
+- [ ] Історія генерацій і порівняння версій наборів
 
-### Лицензия
+### Ліцензія
 
-MIT, см. [LICENSE](LICENSE).
+MIT, див. [LICENSE](LICENSE).

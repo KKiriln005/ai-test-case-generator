@@ -30,7 +30,7 @@ jobs:
       matrix:
         python-version: ["3.10", "3.12"]
     env:
-      # app.main при импорте проверяет наличие ключа; реальный API в тестах не вызывается.
+      # app.main під час імпорту перевіряє наявність ключа; реальний API в тестах не викликається.
       ANTHROPIC_API_KEY: test-key
     steps:
       - uses: actions/checkout@v4
@@ -47,7 +47,7 @@ jobs:
         with:
           files: coverage.xml
           token: ${{ secrets.CODECOV_TOKEN }}
-          fail_ci_if_error: false   # без токена CI не падает, просто не будет бейджа
+          fail_ci_if_error: false   # без токена CI не падає, просто не буде бейджа
       - uses: actions/upload-artifact@v4
         if: matrix.python-version == '3.12'
         with:
@@ -74,7 +74,7 @@ jobs:
           docker run -d --name app -p 8000:8000 -e ANTHROPIC_API_KEY=test-key req2test:ci
           for i in $(seq 1 20); do
             if curl -fs http://localhost:8000/health; then
-              # Контейнер обязан работать от непривилегированного appuser (см. Dockerfile).
+              # Контейнер зобов'язаний працювати від непривілейованого appuser (див. Dockerfile).
               test "$(docker exec app id -un)" = appuser && exit 0
               echo "Container runs as $(docker exec app id -un), expected appuser"; exit 1
             fi

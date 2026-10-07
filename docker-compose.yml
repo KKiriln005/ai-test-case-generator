@@ -5,7 +5,7 @@ services:
     ports:
       - "8000:8000"
     env_file:
-      - .env            # ANTHROPIC_API_KEY, ANTHROPIC_MODEL и т.д.
+      - .env            # ANTHROPIC_API_KEY, ANTHROPIC_MODEL тощо
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://127.0.0.1:8000/health', timeout=3)"]

@@ -1,4 +1,4 @@
-"""Тесты HTTP-слоя: сервис подменяется через dependency_overrides."""
+"""Тести HTTP-шару: сервіс підмінюється через dependency_overrides."""
 import pytest
 from fastapi.testclient import TestClient
 
@@ -97,7 +97,7 @@ def test_stream_endpoint_reports_midstream_error_as_event(client):
 
     response = client.post("/api/generate-stream", json=REQUIREMENTS)
 
-    assert response.status_code == 200  # заголовки уже отправлены, ошибка идёт событием
+    assert response.status_code == 200  # заголовки вже надіслано, помилка йде подією
     assert "event: error" in response.text
     assert AIRateLimitError.public_message in response.text
 
@@ -115,7 +115,7 @@ def test_stream_endpoint_hides_unexpected_errors(client):
 def test_stream_endpoint_validates_before_streaming(client):
     response = client.post("/api/generate-stream", json={"requirements": "short"})
 
-    assert response.status_code == 422  # обычный JSON, поток не начинается
+    assert response.status_code == 422  # звичайний JSON, потік не починається
     assert response.headers["content-type"].startswith("application/json")
 
 
@@ -133,3 +133,9 @@ def test_index_uses_streaming_endpoint(client):
 
     assert "/api/generate-stream" in page
     assert 'id="stop"' in page
+
+
+def test_russian_language_is_not_supported(client):
+    response = client.post("/api/generate", json={**REQUIREMENTS, "language": "ru"})
+
+    assert response.status_code == 422

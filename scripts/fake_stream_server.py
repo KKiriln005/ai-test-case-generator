@@ -1,16 +1,16 @@
-"""Локальный стенд для ручного тестирования веб-интерфейса без API-ключа и без затрат на токены.
+"""Локальний стенд для ручного тестування веб-інтерфейсу без API-ключа і без витрат на токени.
 
-Поднимает настоящее приложение `app.main:app`, но подменяет AIService фейком, который отдаёт
-кейсы с задержкой - так видно, как они появляются в UI по одному.
+Піднімає справжній застосунок `app.main:app`, але підмінює AIService фейком, який віддає
+кейси із затримкою - так видно, як вони з'являються в UI по одному.
 
-Запуск (из корня проекта):
-    python scripts/fake_stream_server.py            # сценарий ok
-    python scripts/fake_stream_server.py error      # ошибка посреди потока (после 2-го кейса)
-    python scripts/fake_stream_server.py early      # ошибка до первого кейса (429)
-    python scripts/fake_stream_server.py drop       # обрыв соединения: поток закрылся без `done`
-    python scripts/fake_stream_server.py hang       # 2 кейса, затем тишина (кнопка «Остановить»)
-Переменная FAKE_DELAY задаёт паузу между кейсами в секундах (по умолчанию 0.8).
-Открыть: http://127.0.0.1:8000
+Запуск (з кореня проєкту):
+    python scripts/fake_stream_server.py            # сценарій ok
+    python scripts/fake_stream_server.py error      # помилка посеред потоку (після 2-го кейса)
+    python scripts/fake_stream_server.py early      # помилка до першого кейса (429)
+    python scripts/fake_stream_server.py drop       # обрив з'єднання: потік закрився без `done`
+    python scripts/fake_stream_server.py hang       # 2 кейси, потім тиша (кнопка «Зупинити»)
+Змінна FAKE_DELAY задає паузу між кейсами в секундах (за замовчуванням 0.8).
+Відкрити: http://127.0.0.1:8000
 """
 import asyncio
 import os
@@ -18,7 +18,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-os.environ.setdefault("ANTHROPIC_API_KEY", "fake-key")  # реальный API не вызывается
+os.environ.setdefault("ANTHROPIC_API_KEY", "fake-key")  # реальний API не викликається
 
 import uvicorn  # noqa: E402
 
@@ -36,12 +36,12 @@ PRIORITIES = ["Critical", "High", "Medium", "Low"]
 def fake_case(n: int) -> TestCase:
     return TestCase(
         id=f"TC-{n:03d}",
-        title=f"Демо-кейс №{n}: вход с паролем длиной {7 + n} символов",
+        title=f"Демо-кейс №{n}: вхід з паролем довжиною {7 + n} символів",
         test_type=TYPES[n % 4],
         priority=PRIORITIES[n % 4],
-        preconditions="Пользователь зарегистрирован",
-        steps=["Открыть страницу входа", "Ввести email и пароль", "Нажать «Войти»"],
-        expected_result="Система реагирует согласно требованиям",
+        preconditions="Користувач зареєстрований",
+        steps=["Відкрити сторінку входу", "Ввести email і пароль", "Натиснути «Увійти»"],
+        expected_result="Система реагує відповідно до вимог",
         test_data=f"password: {'a' * (7 + n)}",
     )
 
@@ -52,8 +52,8 @@ class FakeAIService:
 
     def _suite(self, count: int) -> TestSuite:
         return TestSuite(
-            summary="Демо-набор от фейкового сервиса: проверка UI без обращения к Claude.",
-            assumptions=["Это тестовые данные, а не ответ модели."],
+            summary="Демо-набір від фейкового сервісу: перевірка UI без звернення до Claude.",
+            assumptions=["Це тестові дані, а не відповідь моделі."],
             test_cases=[fake_case(i) for i in range(1, count + 1)],
         )
 
@@ -80,10 +80,10 @@ class FakeAIService:
 def main() -> None:
     scenario = sys.argv[1] if len(sys.argv) > 1 else "ok"
     if scenario not in SCENARIOS:
-        sys.exit(f"Неизвестный сценарий {scenario!r}. Доступны: {', '.join(sorted(SCENARIOS))}")
+        sys.exit(f"Невідомий сценарій {scenario!r}. Доступні: {', '.join(sorted(SCENARIOS))}")
     service = FakeAIService(scenario, float(os.environ.get("FAKE_DELAY", "0.8")))
     app.dependency_overrides[get_ai_service] = lambda: service
-    print(f"Fake AI scenario: {scenario}. Открой http://127.0.0.1:8000")
+    print(f"Fake AI scenario: {scenario}. Відкрий http://127.0.0.1:8000")
     uvicorn.run(app, host="127.0.0.1", port=int(os.environ.get("PORT", "8000")))
 
 

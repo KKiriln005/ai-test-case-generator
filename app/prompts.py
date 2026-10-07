@@ -1,9 +1,9 @@
-"""Промпты. Хранятся отдельно от кода сервиса, чтобы их можно было версионировать и A/B-тестировать."""
+"""Промпти. Зберігаються окремо від коду сервісу, щоб їх можна було версіонувати та A/B-тестувати."""
 
 TOOL_NAME = "submit_test_suite"
 TOOL_DESCRIPTION = "Submit the final, complete test suite for the analysed requirements."
 
-LANGUAGE_NAMES = {"ru": "Russian", "en": "English"}
+LANGUAGE_NAMES = {"uk": "Ukrainian", "en": "English"}
 
 SYSTEM_PROMPT_TEMPLATE = """\
 You are a Senior QA Engineer (ISTQB Advanced level) who designs test cases from requirements \
@@ -60,6 +60,6 @@ def build_system_prompt(*, max_cases: int, language: str) -> str:
 
 
 def build_user_prompt(requirements: str) -> str:
-    # Не даём пользователю «закрыть» тег и выйти из блока данных.
+    # Не даємо користувачу «закрити» тег і вийти з блоку даних.
     safe = requirements.replace("</requirements>", "")
     return USER_PROMPT_TEMPLATE.format(requirements=safe)

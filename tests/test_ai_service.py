@@ -1,4 +1,4 @@
-"""Юнит-тесты AIService с полностью замоканным AsyncAnthropic (сеть не используется)."""
+"""Юніт-тести AIService з повністю замоканим AsyncAnthropic (мережа не використовується)."""
 import json
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock
@@ -58,7 +58,7 @@ def make_service(*side_effects):
 INVALID_PAYLOAD = {"summary": "s", "assumptions": [], "test_cases": [{"title": "no required fields"}]}
 
 
-# ---------------------------------------------------------------- успешный сценарий
+# ---------------------------------------------------------------- успішний сценарій
 
 async def test_success_renumbers_ids():
     service, client = make_service(tool_response(make_payload(3)))
@@ -90,7 +90,7 @@ async def test_request_forces_tool_and_embeds_limits():
     assert "<requirements>" in kwargs["messages"][0]["content"]
 
 
-# ---------------------------------------------------------------- retry при невалидной структуре
+# ---------------------------------------------------------------- retry при невалідній структурі
 
 async def test_retries_once_on_invalid_structure():
     service, client = make_service(tool_response(INVALID_PAYLOAD), tool_response(make_payload(2)))
@@ -132,7 +132,7 @@ async def test_max_tokens_is_not_retried():
     assert client.messages.create.await_count == 1
 
 
-# ---------------------------------------------------------------- ошибки API -> доменные
+# ---------------------------------------------------------------- помилки API -> доменні
 
 API_ERRORS = [
     pytest.param(status_error(AuthenticationError, 401), AIConfigError, 500, id="401-auth"),
@@ -156,13 +156,13 @@ async def test_api_errors_are_translated(error, expected, http_status):
 
     assert type(info.value) is expected
     assert info.value.status_code == http_status
-    assert client.messages.create.await_count == 1  # ретраи сети делает SDK, не сервис
+    assert client.messages.create.await_count == 1  # ретраї мережі робить SDK, не сервіс
 
 
-# ---------------------------------------------------------------- потоковый режим
+# ---------------------------------------------------------------- потоковий режим
 
 class FakeStream:
-    """Подделка `client.messages.stream(...)`: async context manager + async iterator событий."""
+    """Підробка `client.messages.stream(...)`: async context manager + async iterator подій."""
 
     def __init__(self, chunks, final):
         self._chunks, self._final = chunks, final
@@ -244,7 +244,7 @@ async def test_stream_max_tokens_after_cases_raises_output_error():
     except AIOutputError as exc:
         error = exc
 
-    assert [e.event for e in events] == ["case", "case"]  # уже отправленные кейсы не теряются
+    assert [e.event for e in events] == ["case", "case"]  # уже надіслані кейси не губляться
     assert isinstance(error, AIOutputError)
 
 
@@ -273,7 +273,7 @@ async def test_stream_broken_json_becomes_output_error():
 
 async def test_stream_invalid_final_suite_raises():
     payload = make_payload(1)
-    service = stream_service_for(payload, tool_response({"test_cases": payload["test_cases"]}))  # нет summary
+    service = stream_service_for(payload, tool_response({"test_cases": payload["test_cases"]}))  # немає summary
 
     with pytest.raises(AIOutputError):
         [e async for e in service.stream_test_suite(make_request())]
@@ -294,3 +294,12 @@ async def test_stream_ignores_non_json_events():
     events = [e async for e in service.stream_test_suite(make_request())]
 
     assert [e.event for e in events] == ["case", "done"]
+
+
+async def test_default_language_is_ukrainian():
+    service, client = make_service(tool_response(make_payload(3)))
+
+    await service.generate_test_suite(make_request())
+
+    assert make_request().language == "uk"
+    assert "Ukrainian" in client.messages.create.call_args.kwargs["system"]

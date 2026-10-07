@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="ru">
+<html lang="uk">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Req2Test - тест-кейсы из требований</title>
+<title>Req2Test - тест-кейси з вимог</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
@@ -49,7 +49,7 @@
   .btn-spin{display:inline-block;width:14px;height:14px;margin-right:8px;vertical-align:-2px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .9s linear infinite}
   @keyframes spin{to{transform:rotate(360deg)}}
   @media(prefers-reduced-motion:reduce){.spinner,.btn-spin{animation-duration:3s}.case.new{animation:none}}
-  .exportbar{flex:none;max-width:320px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}.exportbar select{width:auto}
+  .exportbar{flex:none;max-width:380px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}.exportbar select{width:auto}
   .exportbar .hint{flex-basis:100%;text-align:right;margin:0}
   .ghost{background:#fff;color:var(--muted);border-color:var(--line);width:100%;margin-top:8px}
   .case.new{animation:appear .35s ease-out}
@@ -67,47 +67,47 @@
 <body>
 <div class="shell">
   <h1>Req2Test</h1>
-  <p class="lead">Вставьте User Story или требования - получите тест-кейсы с эквивалентными классами, граничными значениями, позитивными и негативными сценариями.</p>
+  <p class="lead">Вставте User Story або вимоги - отримайте тест-кейси з класами еквівалентності, граничними значеннями, позитивними та негативними сценаріями.</p>
 
   <div class="layout">
     <form id="form">
       <div id="error" role="alert" hidden></div>
       <div class="field">
-        <label for="requirements">Требования или User Story</label>
+        <label for="requirements">Вимоги або User Story</label>
         <textarea id="requirements" required minlength="20" maxlength="{{ max_chars }}"
-          placeholder="Как пользователь, я хочу зарегистрироваться по email и паролю (8-64 символа), чтобы войти в личный кабинет."></textarea>
-        <div class="hint">От 20 до {{ max_chars }} символов.</div>
+          placeholder="Як користувач, я хочу зареєструватися за email і паролем (8-64 символи), щоб увійти в особистий кабінет."></textarea>
+        <div class="hint">Від 20 до {{ max_chars }} символів.</div>
       </div>
       <div class="row">
-        <div class="field"><label for="max_cases">Макс. кейсов</label>
+        <div class="field"><label for="max_cases">Макс. кейсів</label>
           <input id="max_cases" type="number" min="3" max="30" value="10"></div>
-        <div class="field"><label for="language">Язык кейсов</label>
-          <select id="language"><option value="ru">Русский</option><option value="en">English</option></select></div>
+        <div class="field"><label for="language">Мова кейсів</label>
+          <select id="language"><option value="uk">Українська</option><option value="en">English</option></select></div>
       </div>
-      <button class="primary" id="generate" type="submit">Сгенерировать тест-кейсы</button>
-      <button class="ghost" id="stop" type="button" hidden>Остановить генерацию</button>
+      <button class="primary" id="generate" type="submit">Згенерувати тест-кейси</button>
+      <button class="ghost" id="stop" type="button" hidden>Зупинити генерацію</button>
     </form>
 
     <main id="results">
-      <div class="empty">Здесь появится набор тест-кейсов. Кейсы добавляются по мере генерации.</div>
+      <div class="empty">Тут з’явиться набір тест-кейсів. Кейси додаються в міру генерації.</div>
     </main>
   </div>
 </div>
 
 <script>
 const $ = (s) => document.querySelector(s);
-const TYPE_RU = {Positive:'Позитивный', Negative:'Негативный', Boundary:'Граничные значения', Equivalence:'Эквивалентный класс'};
-const PRIO_RU = {Critical:'Критичный', High:'Высокий', Medium:'Средний', Low:'Низкий'};
+const TYPE_UK = {Positive:'Позитивний', Negative:'Негативний', Boundary:'Граничні значення', Equivalence:'Клас еквівалентності'};
+const PRIO_UK = {Critical:'Критичний', High:'Високий', Medium:'Середній', Low:'Низький'};
 const FORMATS = [['json','JSON'], ['csv','CSV Standard'], ['zephyr','Zephyr Scale CSV'], ['testrail','TestRail CSV']];
-const IDLE_TIMEOUT_MS = 90000;  // нет ни одного байта столько времени -> считаем, что сервер завис
-const GENERATE_LABEL = 'Сгенерировать тест-кейсы';
+const IDLE_TIMEOUT_MS = 90000;  // стільки часу не прийшло жодного байта -> вважаємо, що сервер завис
+const GENERATE_LABEL = 'Згенерувати тест-кейси';
 
-let currentSuite = null;   // полный набор из события `done` - единственный источник для экспорта
+let currentSuite = null;   // повний набір з події `done` - єдине джерело для експорту
 let currentFormat = 'csv';
-let controller = null;     // AbortController текущей генерации
-let stopReason = null;     // 'user' | 'idle' - почему мы сами оборвали поток
+let controller = null;     // AbortController поточної генерації
+let stopReason = null;     // 'user' | 'idle' - чому ми самі обірвали потік
 
-// Хелпер создания DOM-узлов. Текст вставляется как text node -> XSS из ответа модели невозможен.
+// Хелпер створення DOM-вузлів. Текст вставляється як text node -> XSS з відповіді моделі неможливий.
 function h(tag, attrs = {}, ...kids) {
   const n = document.createElement(tag);
   for (const [k, v] of Object.entries(attrs)) {
@@ -117,13 +117,13 @@ function h(tag, attrs = {}, ...kids) {
   return n;
 }
 
-class StreamError extends Error {}  // ошибка, о которой сообщил сам сервер (событие `error`)
+class StreamError extends Error {}  // помилка, про яку повідомив сам сервер (подія `error`)
 
 async function errorMessage(r) {
   try {
     const j = await r.json();
-    return typeof j.detail === 'string' ? j.detail : (j.detail?.[0]?.msg || 'Проверьте введённые данные.');
-  } catch { return `Ошибка ${r.status}`; }
+    return typeof j.detail === 'string' ? j.detail : (j.detail?.[0]?.msg || 'Перевірте введені дані.');
+  } catch { return `Помилка ${r.status}`; }
 }
 
 async function post(url, body, timeoutMs = 30000) {
@@ -133,13 +133,13 @@ async function post(url, body, timeoutMs = 30000) {
 }
 
 // ---------------------------------------------------------------- SSE поверх fetch
-// EventSource умеет только GET, поэтому POST-поток читаем вручную.
+// EventSource вміє лише GET, тому POST-потік читаємо вручну.
 
 function parseFrame(frame) {
   let event = 'message';
   const data = [];
   for (const line of frame.split(/\r?\n/)) {
-    if (!line || line.startsWith(':')) continue;  // ':' - комментарий / keep-alive
+    if (!line || line.startsWith(':')) continue;  // ':' - коментар / keep-alive
     const i = line.indexOf(':');
     const field = i < 0 ? line : line.slice(0, i);
     let value = i < 0 ? '' : line.slice(i + 1);
@@ -187,94 +187,94 @@ async function streamSuite(body, onCase) {
   stopReason = null;
   const r = await fetch('/api/generate-stream', {method:'POST', headers:{'Content-Type':'application/json'},
     body:JSON.stringify(body), signal:controller.signal});
-  if (!r.ok) throw new StreamError(await errorMessage(r));  // 422 / 500 до начала потока
+  if (!r.ok) throw new StreamError(await errorMessage(r));  // 422 / 500 до початку потоку
   for await (const {event, data} of readSSE(r)) {
     if (event === 'case') onCase(data);
     else if (event === 'done') return data;
-    else if (event === 'error') throw new StreamError(data.detail || 'Ошибка генерации.');
+    else if (event === 'error') throw new StreamError(data.detail || 'Помилка генерації.');
   }
-  throw new Error('closed');  // поток закрылся без `done` и без `error`
+  throw new Error('closed');  // потік закрився без `done` і без `error`
 }
 
 function describeError(e) {
-  if (stopReason === 'user') return 'Генерация остановлена.';
-  if (stopReason === 'idle') return `Сервер не присылал данных ${IDLE_TIMEOUT_MS / 1000} с, генерация прервана. Повторите попытку.`;
+  if (stopReason === 'user') return 'Генерацію зупинено.';
+  if (stopReason === 'idle') return `Сервер не надсилав даних ${IDLE_TIMEOUT_MS / 1000} с, генерацію перервано. Спробуйте ще раз.`;
   if (e instanceof StreamError) return e.message;
-  if (e.message === 'closed') return 'Соединение с сервером оборвалось до завершения генерации. Повторите попытку.';
-  if (e instanceof SyntaxError) return 'Сервер прислал повреждённые данные. Повторите попытку.';
-  if (e instanceof TypeError) return 'Нет связи с сервером. Проверьте, что приложение запущено.';
-  return e.message || 'Неизвестная ошибка.';
+  if (e.message === 'closed') return 'З’єднання з сервером обірвалося до завершення генерації. Спробуйте ще раз.';
+  if (e instanceof SyntaxError) return 'Сервер надіслав пошкоджені дані. Спробуйте ще раз.';
+  if (e instanceof TypeError) return 'Немає зв’язку з сервером. Перевірте, що застосунок запущено.';
+  return e.message || 'Невідома помилка.';
 }
 
-// ---------------------------------------------------------------- отрисовка
+// ---------------------------------------------------------------- відмальовування
 
 function caseNode(tc, animate = false) {
   const dl = h('dl', {class:'body'},
-    h('dt', {}, 'Предусловия'), h('dd', {}, tc.preconditions),
-    h('dt', {}, 'Шаги'), h('dd', {}, h('ol', {}, tc.steps.map(s => h('li', {}, s)))),
-    h('dt', {}, 'Тестовые данные'), h('dd', {}, tc.test_data),
-    h('dt', {}, 'Ожидаемый результат'), h('dd', {}, tc.expected_result));
+    h('dt', {}, 'Передумови'), h('dd', {}, tc.preconditions),
+    h('dt', {}, 'Кроки'), h('dd', {}, h('ol', {}, tc.steps.map(s => h('li', {}, s)))),
+    h('dt', {}, 'Тестові дані'), h('dd', {}, tc.test_data),
+    h('dt', {}, 'Очікуваний результат'), h('dd', {}, tc.expected_result));
   return h('details', {class: animate ? 'case new' : 'case', 'data-type':tc.test_type, 'data-id':tc.id},
     h('summary', {},
       h('span', {class:'tcid'}, tc.id), h('span', {}, tc.title),
-      h('span', {class:'meta'}, `${TYPE_RU[tc.test_type] || tc.test_type}, ${PRIO_RU[tc.priority] || tc.priority}`)),
+      h('span', {class:'meta'}, `${TYPE_UK[tc.test_type] || tc.test_type}, ${PRIO_UK[tc.priority] || tc.priority}`)),
     dl);
 }
 
 function exportBar(enabled) {
-  const fmtSelect = h('select', {'aria-label':'Формат экспорта', disabled:!enabled, onchange:(e) => { currentFormat = e.target.value; }},
+  const fmtSelect = h('select', {'aria-label':'Формат експорту', disabled:!enabled, onchange:(e) => { currentFormat = e.target.value; }},
     FORMATS.map(([v, t]) => h('option', {value:v}, t)));
   fmtSelect.value = currentFormat;
   return h('div', {class:'exportbar'}, fmtSelect,
-    h('button', {class:'secondary', type:'button', id:'download', disabled:!enabled, onclick:download}, 'Скачать'),
-    enabled ? null : h('p', {class:'hint'}, 'Экспорт станет доступен после завершения генерации.'));
+    h('button', {class:'secondary', type:'button', id:'download', disabled:!enabled, onclick:download}, 'Завантажити'),
+    enabled ? null : h('p', {class:'hint'}, 'Експорт стане доступний після завершення генерації.'));
 }
 
 function render(suite) {
-  // Сохраняем раскрытые кейсы, чтобы финальная перерисовка после стрима их не схлопнула.
+  // Зберігаємо розгорнуті кейси, щоб фінальне перемальовування після стриму їх не згорнуло.
   const open = new Set([...document.querySelectorAll('#results details[open]')].map(d => d.dataset.id));
   const parts = [h('div', {class:'head'},
-    h('div', {}, h('h2', {}, `Тест-кейсов: ${suite.test_cases.length}`), h('p', {role:'status'}, suite.summary)),
+    h('div', {}, h('h2', {}, `Тест-кейсів: ${suite.test_cases.length}`), h('p', {role:'status'}, suite.summary)),
     exportBar(true))];
   if (suite.assumptions.length)
-    parts.push(h('div', {class:'assump'}, h('h3', {}, 'Допущения и неясности в требованиях'),
+    parts.push(h('div', {class:'assump'}, h('h3', {}, 'Припущення та неясності у вимогах'),
       h('ul', {}, suite.assumptions.map(a => h('li', {}, a)))));
   parts.push(...suite.test_cases.map(tc => { const n = caseNode(tc); n.open = open.has(tc.id); return n; }));
   $('#results').replaceChildren(...parts);
 }
 
-const emptyNode = () => h('div', {class:'empty'}, 'Здесь появится набор тест-кейсов. Кейсы добавляются по мере генерации.');
+const emptyNode = () => h('div', {class:'empty'}, 'Тут з’явиться набір тест-кейсів. Кейси додаються в міру генерації.');
 
-// Вид «идёт генерация»: кейсы добавляются в список по одному, внизу - строка ожидания.
+// Вигляд «триває генерація»: кейси додаються до списку по одному, внизу - рядок очікування.
 function streamView(maxCases) {
   const t0 = Date.now();
   let count = 0;
-  const title = h('h2', {}, 'Генерация…');
-  const status = h('p', {role:'status'}, 'Claude анализирует требования.');
+  const title = h('h2', {}, 'Генерація…');
+  const status = h('p', {role:'status'}, 'Claude аналізує вимоги.');
   const list = h('div', {});
-  const tailText = h('span', {}, 'Claude анализирует требования и проектирует первый кейс…');
-  const seconds = h('span', {'aria-hidden':'true'}, ' Прошло 0 с');
+  const tailText = h('span', {}, 'Claude аналізує вимоги та проєктує перший кейс…');
+  const seconds = h('span', {'aria-hidden':'true'}, ' Минуло 0 с');
   const tail = h('div', {class:'tail'}, h('div', {class:'spinner', 'aria-hidden':'true'}), h('div', {}, tailText, seconds));
   $('#results').replaceChildren(h('div', {class:'head'}, h('div', {}, title, status), exportBar(false)), list, tail);
-  const timer = setInterval(() => { seconds.textContent = ` Прошло ${Math.floor((Date.now() - t0) / 1000)} с`; }, 1000);
+  const timer = setInterval(() => { seconds.textContent = ` Минуло ${Math.floor((Date.now() - t0) / 1000)} с`; }, 1000);
 
   return {
     get count() { return count; },
     addCase(tc) {
       count += 1;
       list.append(caseNode(tc, true));
-      title.textContent = `Получено кейсов: ${count}`;
-      status.textContent = `Получено ${count} из не более чем ${maxCases}.`;
-      tailText.textContent = 'Claude пишет следующий тест-кейс…';
+      title.textContent = `Отримано кейсів: ${count}`;
+      status.textContent = `Отримано ${count} з не більш ніж ${maxCases}.`;
+      tailText.textContent = 'Claude пише наступний тест-кейс…';
     },
-    // Поток оборвался, но часть кейсов уже показана: оставляем их и честно помечаем набор неполным.
+    // Потік обірвався, але частину кейсів уже показано: залишаємо їх і чесно позначаємо набір неповним.
     markPartial() {
       tail.remove();
-      title.textContent = `Получено кейсов: ${count} (набор неполный)`;
-      status.textContent = 'Генерация прервана.';
+      title.textContent = `Отримано кейсів: ${count} (набір неповний)`;
+      status.textContent = 'Генерацію перервано.';
       $('#results .exportbar .hint')?.remove();
       list.before(h('div', {class:'partial'},
-        'Генерация не завершилась: показаны только полученные кейсы. Экспорт недоступен - запустите генерацию ещё раз.'));
+        'Генерація не завершилася: показано лише отримані кейси. Експорт недоступний - запустіть генерацію ще раз.'));
     },
     stop() { clearInterval(timer); },
   };
@@ -285,7 +285,7 @@ function showError(msg) { const box = $('#error'); box.textContent = msg; box.hi
 function setBusy(busy) {
   const btn = $('#generate');
   btn.disabled = busy;
-  if (busy) btn.replaceChildren(h('span', {class:'btn-spin', 'aria-hidden':'true'}), 'Генерирую…');
+  if (busy) btn.replaceChildren(h('span', {class:'btn-spin', 'aria-hidden':'true'}), 'Генерую…');
   else btn.textContent = GENERATE_LABEL;
   $('#stop').hidden = !busy;
 }
@@ -307,10 +307,10 @@ $('#stop').addEventListener('click', () => { stopReason = 'user'; controller?.ab
 
 $('#form').addEventListener('submit', async (ev) => {
   ev.preventDefault();
-  if (controller) return;  // защита от двойного запуска
+  if (controller) return;  // захист від подвійного запуску
   showError('');
   const previous = currentSuite;
-  currentSuite = null;     // пока идёт новая генерация, старый набор не экспортируем
+  currentSuite = null;     // поки триває нова генерація, старий набір не експортуємо
   const body = {
     requirements: $('#requirements').value,
     max_cases: Number($('#max_cases').value),
@@ -325,7 +325,7 @@ $('#form').addEventListener('submit', async (ev) => {
     const msg = describeError(e);
     if (view.count > 0) {
       view.markPartial();
-    } else if (previous) {         // ничего не пришло - возвращаем прошлый результат
+    } else if (previous) {         // нічого не прийшло - повертаємо попередній результат
       currentSuite = previous;
       render(previous);
     } else {

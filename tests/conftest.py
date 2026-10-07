@@ -1,4 +1,4 @@
 import os
 
-# app.main при импорте требует ключ (fail-fast). Реальный API в тестах не вызывается.
+# app.main під час імпорту вимагає ключ (fail-fast). Реальний API в тестах не викликається.
 os.environ.setdefault("ANTHROPIC_API_KEY", "test-key")
