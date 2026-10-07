@@ -1,7 +1,7 @@
 # Req2Test
 
-[![CI](https://github.com/KKiriln005/ai-test-case-generator/actions/workflows/ci.yml/badge.svg)](https://github.com/KKiriln005/ai-test-case-generator/actions/workflows/ci.yml)
-[![Coverage](https://codecov.io/gh/KKiriln005/ai-test-case-generator/branch/main/graph/badge.svg)](https://codecov.io/gh/KKiriln005/ai-test-case-generator)
+[![CI](https://github.com/KKyrylin005/ai-test-case-generator/actions/workflows/ci.yml/badge.svg)](https://github.com/KKyrylin005/ai-test-case-generator/actions/workflows/ci.yml)
+[![Coverage](https://codecov.io/gh/KKyrylin005/ai-test-case-generator/branch/main/graph/badge.svg)](https://codecov.io/gh/KKyrylin005/ai-test-case-generator)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -52,7 +52,7 @@ flowchart LR
 Requires Python 3.10+ and an [Anthropic API](https://console.anthropic.com/) key.
 
 ```bash
-git clone https://github.com/KKiriln005/ai-test-case-generator.git && cd ai-test-case-generator
+git clone https://github.com/KKyrylin005/ai-test-case-generator.git && cd ai-test-case-generator
 python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 cp .env.example .env                                  # set ANTHROPIC_API_KEY
@@ -194,7 +194,7 @@ flowchart LR
 Потрібен Python 3.10+ і ключ [Anthropic API](https://console.anthropic.com/).
 
 ```bash
-git clone https://github.com/KKiriln005/ai-test-case-generator.git && cd ai-test-case-generator
+git clone https://github.com/KKyrylin005/ai-test-case-generator.git && cd ai-test-case-generator
 python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 cp .env.example .env                                  # впишіть ANTHROPIC_API_KEY
